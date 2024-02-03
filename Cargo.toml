@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
+ignore = "0.4.22"
+walkdir = "2.4.0"
+

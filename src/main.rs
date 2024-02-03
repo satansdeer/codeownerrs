@@ -1,4 +1,6 @@
 use clap::{Parser, Subcommand};
+use codeownerrs::paths::list;
+
 
 /// A tool for interacting with GitHub's
 /// [CODEOWNERS](https://help.github.com/articles/about-codeowners/) files.
@@ -19,7 +21,7 @@ enum Commands {
 
         /// Max traversal depth
         #[arg(short, long)]
-        depth: i32,
+        depth: Option<i32>,
 
         /// List the files not covered by the `CODEOWNERS`
         #[arg(short, long)]
@@ -42,5 +44,5 @@ enum Commands {
 fn main() {
     let args = Args::parse();
 
-    println!("Hello world!")
+    list();    
 }
