@@ -1,14 +1,15 @@
 use clap::{Parser, Subcommand};
 use codeownerrs::paths::list;
-
+use std::path::Path;
 
 /// A tool for interacting with GitHub's
 /// [CODEOWNERS](https://help.github.com/articles/about-codeowners/) files.
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
-struct Args {
+#[command(propagate_version = true)]
+struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 #[derive(Subcommand)]
@@ -21,7 +22,7 @@ enum Commands {
 
         /// Max traversal depth
         #[arg(short, long)]
-        depth: Option<i32>,
+        depth: Option<usize>,
 
         /// List the files not covered by the `CODEOWNERS`
         #[arg(short, long)]
@@ -32,7 +33,7 @@ enum Commands {
         /// Path to verify
         path: Option<String>,
 
-        /// A space-separated list of users/teams 
+        /// A space-separated list of users/teams
         users: Vec<String>,
 
         /// Specify a non-standard CODEOWNERS filename
@@ -42,7 +43,25 @@ enum Commands {
 }
 
 fn main() {
-    let args = Args::parse();
+    let cli = Cli::parse();
 
-    list();    
+    // You can check for the existence of subcommands, and if found use their
+    // matches just as you would the top level cmd
+    match &cli.command {
+        Commands::Audit {
+            file,
+            depth,
+            unowned,
+        } => {
+            let codeowners_path = Path::new(file);
+
+            let result = list(*depth);
+            for entry in result {
+                println!("{}", entry.path().display())
+            }
+        }
+        Commands::Verify { .. } => {
+            println!("Verify!");
+        }
+    }
 }
