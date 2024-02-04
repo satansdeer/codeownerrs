@@ -11,7 +11,6 @@ pub mod paths {
 }
 
 pub mod test_utils {
-    use std::fs::File;
     use std::io::Write;
     use std::path::PathBuf;
     use tempfile::NamedTempFile;
@@ -111,8 +110,11 @@ pub mod code_owners {
         ///
         /// let contents = "/src user1 user2\n";
         /// let (_temp_file, temp_path) = create_temp_codeowners_file(contents);
-        /// let code_owners = CodeOwners::new(temp_path.into_os_string().into_string().unwrap()).unwrap();
+        /// let path =  temp_path.into_os_string().into_string().unwrap();
+        ///
+        /// let code_owners = CodeOwners::new(path).unwrap();
         /// let owners = code_owners.get_owners("/src");
+        ///
         /// assert_eq!(code_owners.entries.len(), 1);
         /// assert!(owners.contains(&"user1".to_string()));
         /// ```
