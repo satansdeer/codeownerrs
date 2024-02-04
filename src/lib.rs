@@ -16,13 +16,14 @@ pub mod test_utils {
     use std::path::PathBuf;
     use tempfile::NamedTempFile;
 
-    /// Creates a temporary file with the given contents and returns the path.
-    /// The temporary file is automatically deleted when it goes out of scope.
-    pub fn create_temp_codeowners_file(contents: &str) -> PathBuf {
+    /// Creates a temporary file with the given contents and returns both the file and its path.
+    /// This way, the file will not be deleted as long as the `NamedTempFile` is in scope.
+    pub fn create_temp_codeowners_file(contents: &str) -> (NamedTempFile, PathBuf) {
         let mut temp_file = NamedTempFile::new().expect("Failed to create temporary file");
-        writeln!(temp_file, "{}", contents).expect("Failed to write to temporary file");
+        write!(temp_file, "{}", contents).expect("Failed to write to temporary file");
 
-        temp_file.into_temp_path().to_path_buf()
+        let temp_path = temp_file.path().to_owned();
+        (temp_file, temp_path)
     }
 }
 
@@ -67,8 +68,8 @@ pub mod code_owners {
         /// use codeownerrs::test_utils::create_temp_codeowners_file;
         ///
         /// let contents = "/src user1 user2\n";
-        /// let temp_path = create_temp_codeowners_file(contents);
-        /// let code_owners = CodeOwners::new(temp_path.to_string()).unwrap();
+        /// let (_temp_file, temp_path) = create_temp_codeowners_file(contents);
+        /// let code_owners = CodeOwners::new(temp_path.into_os_string().into_string().unwrap()).unwrap();
         /// assert_eq!(code_owners.entries.len(), 1);
         /// ```
         ///
@@ -105,10 +106,15 @@ pub mod code_owners {
         /// Assuming `code_owners` has been properly initialized:
         ///
         /// ```
-        /// # use codeownerrs::code_owners::CodeOwners;
-        /// # let code_owners = CodeOwners::new("path/to/codeowners/file.txt".to_string()).unwrap();
-        /// let owners = code_owners.get_owners("/src/lib.rs");
-        /// assert!(owners.contains(&"username1".to_string()));
+        /// use codeownerrs::code_owners::CodeOwners;
+        /// use codeownerrs::test_utils::create_temp_codeowners_file;
+        ///
+        /// let contents = "/src user1 user2\n";
+        /// let (_temp_file, temp_path) = create_temp_codeowners_file(contents);
+        /// let code_owners = CodeOwners::new(temp_path.into_os_string().into_string().unwrap()).unwrap();
+        /// let owners = code_owners.get_owners("/src");
+        /// assert_eq!(code_owners.entries.len(), 1);
+        /// assert!(owners.contains(&"user1".to_string()));
         /// ```
         ///
         /// # Panics
