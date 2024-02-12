@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use codeownerrs::code_owners::CodeOwners;
 use codeownerrs::paths::list;
 use std::path::Path;
 
@@ -53,7 +54,11 @@ fn main() {
             depth,
             unowned,
         } => {
-            let codeowners_path = Path::new(file);
+            let code_owners = CodeOwners::new(file).unwrap();
+
+            for entry in code_owners.get_owners("/src") {
+                println!("Owner of /src: {}", entry)
+            }
 
             let result = list(*depth);
             for entry in result {

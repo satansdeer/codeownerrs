@@ -44,7 +44,7 @@ pub mod code_owners {
     ///
     /// ```
     /// use codeownerrs::code_owners::CodeOwners;
-    /// let code_owners = CodeOwners::new("CODEOWNERS".to_string()).unwrap();
+    /// let code_owners = CodeOwners::new(&"CODEOWNERS".to_string()).unwrap();
     /// ```
     pub struct CodeOwners {
         pub entries: Vec<Entry>,
@@ -68,14 +68,14 @@ pub mod code_owners {
         ///
         /// let contents = "/src user1 user2\n";
         /// let (_temp_file, temp_path) = create_temp_codeowners_file(contents);
-        /// let code_owners = CodeOwners::new(temp_path.into_os_string().into_string().unwrap()).unwrap();
+        /// let code_owners = CodeOwners::new(&temp_path.into_os_string().into_string().unwrap()).unwrap();
         /// assert_eq!(code_owners.entries.len(), 1);
         /// ```
         ///
         /// # Errors
         ///
         /// This function will return an error if the file cannot be opened or read.
-        pub fn new(file: String) -> std::io::Result<CodeOwners> {
+        pub fn new(file: &String) -> std::io::Result<CodeOwners> {
             let mut file = File::open(file)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
@@ -112,7 +112,7 @@ pub mod code_owners {
         /// let (_temp_file, temp_path) = create_temp_codeowners_file(contents);
         /// let path =  temp_path.into_os_string().into_string().unwrap();
         ///
-        /// let code_owners = CodeOwners::new(path).unwrap();
+        /// let code_owners = CodeOwners::new(&path).unwrap();
         /// let owners = code_owners.get_owners("/src");
         ///
         /// assert_eq!(code_owners.entries.len(), 1);
